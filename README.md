@@ -57,47 +57,53 @@ Options set in build_mesa.sh are essentially targeted at testing the mesa-vulkan
 
 ## Usage
 
-#### with system libdrm
+You could find an example in the file **vktest** on how to link an executable at run-time with your fresh version of Mesa.
+
+> note: you could build multiple versions of Mesa and let them coexists in your local folder
 
 ```bash
 #!/bin/bash
 
+# libdrm installation path
+# comment this line if you want system wise libdrm
+LIB_DRM=/opt/libdrm-2.4.114/x86_64
+
+# Mesa installation path
 MESA_LIB=/opt/mesa-22.1
+
+# Set your Vulkan driver: intel, radeon, lvp, ...
+VK_DRIVER=intel 
+
 export LIBGL_DRIVERS_PATH=$MESA_LIB/x86_64
 export EGL_DRIVERS_PATH=$LIBGL_DRIVERS_PATH
-export LD_LIBRARY_PATH=$LIBGL_DRIVERS_PATH:$LD_LIBRARY_PATH
-export VK_ICD_FILENAMES=$MESA_LIB/share/vulkan/icd.d/intel_icd.x86_64.json
+export LD_LIBRARY_PATH=$LIB_DRM:$LIBGL_DRIVERS_PATH:$LD_LIBRARY_PATH
+export VK_ICD_FILENAMES=$MESA_LIB/share/vulkan/icd.d/${VK_DRIVER}_icd.x86_64.json
 
-# Print some info about rdivers
+# Some Mesa options 
+# export MESA_LOADER_DRIVER_OVERRIDE=iris
+# export MESA_NO_ERROR=1
+# export MESA_DEBUG=silent
+
+# Print some info about drivers
 glxinfo | grep string
 vulkaninfo | grep Version
 vulkaninfo | grep driver
 
-# Path to your executable
+# Change screen resolution and restore it after script exexcution
+# Uncomment if you need this
+
+#finish() {
+#  echo "Restoring screen resolution"
+#  xrandr -s 3840x2160
+#}
+#trap finish EXIT
+#xrandr -s 1600x900
+
+
+# set this Path to your executable
 /usr/bin/vkcube
 ```
 
-#### with custom libdrm
-
-```bash
-#!/bin/bash
-
-LIB_DRM=/opt/libdrm-2.4.114
-MESA_LIB=/opt/mesa-22.1
-export LIBGL_DRIVERS_PATH=$MESA_LIB/x86_64
-export EGL_DRIVERS_PATH=$LIBGL_DRIVERS_PATH
-export LD_LIBRARY_PATH=$LIB_DRM/x86_64:$LIBGL_DRIVERS_PATH:$LD_LIBRARY_PATH
-export VK_ICD_FILENAMES=$MESA_LIB/share/vulkan/icd.d/intel_icd.x86_64.json
-
-# Print some info about rdivers
-glxinfo | grep string
-vulkaninfo | grep Version
-vulkaninfo | grep driver
-
-# Path to your executable
-vkcube
-```
-
-# 
+##### 
 
 # 
